@@ -6,13 +6,24 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class BPTree {
+
+    // tree order
     private int m;
+
+    // root node
     private Node root;
+
+    // ‌tree height ascending
     private int height;
 
     private final class Node {
+        // current number of children
         private int k;
+
+        // current keys
         private Key[] children = new Key[m];
+
+        // next sibling (only used for leaves)
         public Node next;
 
         private Node(int k) {
@@ -21,8 +32,13 @@ public class BPTree {
     }
 
     private static class Key {
+        // key value
         private double key;
+
+        // value (only used for leaves)
         private final String val;
+
+        // the node in next level
         private Node nextLevel;
 
         public Key(double key, String val, Node nextLevel) {
@@ -50,15 +66,10 @@ public class BPTree {
     }
 
 
-    public Key get(double key) {
-        Node node = searchNode(root, key, height);
-        for (Key child : node.children) {
-            if (child.key == key)
-                return child;
-        }
-        return null;
-    }
-
+    /**
+     * @param key
+     * @return the node that contains the exact match for the key
+     */
     public Node getNode(double key) {
         return searchNode(root, key, height);
     }
@@ -76,6 +87,24 @@ public class BPTree {
         else {
             for (int j = 0; j < node.k; j++) {
                 if (key == children[j].key) return node;
+            }
+        }
+        return null;
+    }
+
+    private Node getNodeFLT(double key1) {
+        return searchNodeFLT(root, key1, height);
+    }
+
+    private Node searchNodeFLT(Node node, double key, int height) {
+        Key[] children = node.children;
+            for (int i = 0; i < node.k; i++) {
+                if (i+1 == node.k || (key < children[i+1].key)) {
+                    if (height > 0) {
+                        return searchNode(children[i].nextLevel, key, height - 1);
+                    } else {
+                        return node;
+                    }
             }
         }
         return null;
@@ -162,7 +191,7 @@ public class BPTree {
                     String[] split = search.split(",");
                     double key1 = Double.parseDouble(split[0].trim());
                     double key2 = Double.parseDouble(split[1].trim());
-                    Node r = bpt.getNode(key1);
+                    Node r = bpt.getNodeFLT(key1);
 
                     boolean first = true;
                     while(r != null) {
@@ -221,5 +250,6 @@ public class BPTree {
             }
         }
     }
+
 
 }
