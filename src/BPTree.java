@@ -148,11 +148,15 @@ public class BPTree {
         }
         else {
             for (t = 0; t < node.k; t++) {
-                // condition1: t+1 == node.k, making sure t does not exceed node.children bound
-                // condition2: key < node.children[t+1].key
+                // condition1: making sure t does not exceed node.children bound (or)
+                // condition2: the key to be inserted is less than the next key
                 if (t+1 == node.k || key < node.children[t+1].key) {
+                    // key needs to be inserted at next level, decrease height by one
                     Node u = insertInternal(node.children[t].nextLevel, key, val, height-1);
-                    if (u == null) return null;
+                    if (u == null) {
+                        // the node on the next level didn't need to be split and node has been inserted, just return
+                        return null;
+                    }
                     newKey.key = u.children[0].key;
                     newKey.nextLevel = u;
                     t++;
