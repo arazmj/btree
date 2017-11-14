@@ -52,6 +52,12 @@ public class BPTree {
             this.val = null;
             this.nextLevel = nextLevel;
         }
+
+        public Key(double key, String val) {
+
+            this.key = key;
+            this.val = val;
+        }
     }
 
 
@@ -101,7 +107,7 @@ public class BPTree {
             for (int i = 0; i < node.k; i++) {
                 if (i+1 == node.k || (key < children[i+1].key)) {
                     if (height > 0) {
-                        return searchNode(children[i].nextLevel, key, height - 1);
+                        return searchNodeFLT(children[i].nextLevel, key, height - 1);
                     } else {
                         return node;
                     }
@@ -124,43 +130,51 @@ public class BPTree {
     }
 
     private Node insertInternal(Node node, double key, String val, int height) {
-        int j;
-        Key newKey = new Key(key, val, null);
+        // the index where the key will be inserted (target index)
+        int t;
 
+        // a new Key is created no regardless of if the Key belongs to this level or not
+        // if the Key belongs to the next level(s) the created Key acts as an internal Node
+        Key newKey = new Key(key, val);
+
+
+        // we have reached the leaf level just find the right index in the current node
         if (height == 0) {
-            for (j = 0; j < node.k; j++) {
-                if (key < node.children[j].key) {
+            for (t = 0; t < node.k; t++) {
+                if (key < node.children[t].key) {
                     break;
                 }
             }
         }
         else {
-            for (j = 0; j < node.k; j++) {
-                if (j+1 == node.k || key < node.children[j+1].key) {
-                    Node u = insertInternal(node.children[j].nextLevel, key, val, height-1);
+            for (t = 0; t < node.k; t++) {
+                // condition1: t+1 == node.k, making sure t does not exceed node.children bound
+                // condition2: key < node.children[t+1].key
+                if (t+1 == node.k || key < node.children[t+1].key) {
+                    Node u = insertInternal(node.children[t].nextLevel, key, val, height-1);
                     if (u == null) return null;
                     newKey.key = u.children[0].key;
                     newKey.nextLevel = u;
-                    j++;
+                    t++;
                     break;
                 }
             }
         }
 
-        for (int i = node.k; i > j; i--)
+        for (int i = node.k; i > t; i--)
             node.children[i] = node.children[i-1];
 
-        node.children[j] = newKey;
+        node.children[t] = newKey;
         node.k++;
         if (node.k < m)
             return null;
         else {
-            Node t = new Node(m /2);
+            Node n = new Node(m /2);
             node.k = m /2;
-            t.next = node.next;
-            node.next = t;
-            System.arraycopy(node.children, m / 2, t.children, 0, m / 2);
-            return t;
+            n.next = node.next;
+            node.next = n;
+            System.arraycopy(node.children, m / 2, n.children, 0, m / 2);
+            return n;
         }
     }
 
