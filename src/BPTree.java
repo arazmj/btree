@@ -181,7 +181,7 @@ public class BPTree {
     public static void main(String[] args) {
         List<String> lines = null;
         try {
-            lines = Files.readAllLines(Paths.get("input1.txt"));
+            lines = Files.readAllLines(Paths.get(args[0]));
         } catch (IOException e) {
             e.printStackTrace();
         }
