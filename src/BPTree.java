@@ -178,10 +178,13 @@ public class BPTree {
             return null;
         else {
             int ceil = (int)Math.ceil(m / 2f);
+            // the new node takes the bigger part in case of odd order
             Node n = new Node(ceil);
             node.k = m /2;
             n.next = node.next;
             node.next = n;
+
+            // copy all numbers from m / 2 to ceil( m / 2.0)
             System.arraycopy(node.children, m / 2, n.children, 0, ceil);
             return n;
         }
