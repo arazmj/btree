@@ -1,4 +1,4 @@
-6
+3
 Insert(-416.24,Value0)
 Insert(-385.24,Value1)
 Insert(492.67,Value2)

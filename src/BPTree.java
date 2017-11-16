@@ -59,8 +59,6 @@ public class BPTree {
         // must be even and greater than 2
         if (m < 4)
             m = 4;
-//        if (m % 2 == 1)
-//            m++;
         this.m = m;
         root = new Node(0);
     }
@@ -172,9 +170,11 @@ public class BPTree {
             }
         }
 
+        // shift all the children on the right starting from t to right by one
         for (int i = node.k; i > t; i--)
             node.children[i] = node.children[i-1];
 
+        // insert new key
         node.children[t] = newKey;
         node.k++;
 
@@ -290,6 +290,4 @@ public class BPTree {
             }
         }
     }
-
-
 }
