@@ -127,6 +127,8 @@ public class BPTree {
         tempRoot.children[0] = new Key(root.children[0].key, root);
         tempRoot.children[1] = new Key(splitLeftover.children[0].key, splitLeftover);
         root = tempRoot;
+
+        // if splitting keeps propagating all the way up to root then have a new level
         height++;
     }
 
@@ -138,7 +140,6 @@ public class BPTree {
         // if the Key belongs to the next level(s) the created Key acts as an internal Node
         Key newKey = new Key(key, val);
 
-
         // we have reached the leaf level just find the right index in the current node
         if (height == 0) {
             for (t = 0; t < node.k; t++) {
@@ -149,9 +150,11 @@ public class BPTree {
         }
         else {
             for (t = 0; t < node.k; t++) {
+
                 // condition1: making sure t does not exceed node.children bound (or)
                 // condition2: the key to be inserted is less than the next key
                 if (t+1 == node.k || key < node.children[t+1].key) {
+
                     // key needs to be inserted at next level, decrease height by one
                     Node u = insertInternal(node.children[t].nextLevel, key, val, height-1);
                     if (u == null) {
@@ -174,12 +177,16 @@ public class BPTree {
 
         node.children[t] = newKey;
         node.k++;
+
         if (node.k < m)
             return null;
         else {
             int ceil = (int)Math.ceil(m / 2f);
+
             // the new node takes the bigger part in case of odd order
             Node newNode = new Node(ceil);
+
+            // the old node (current node) takes the smaller part in case of odd order
             node.k = m /2;
 
             // establish a singly linked in the external level
@@ -202,6 +209,7 @@ public class BPTree {
             e.printStackTrace();
         }
 
+        // default BPTree, just in case that order is not provided from the input
         BPTree bpt = new BPTree(4);
 
         for (String line : lines) {
@@ -278,7 +286,7 @@ public class BPTree {
                 // If the line does not start with "Search" or "Insert" then the line must be order number.
                 int m = Integer.parseInt(line.trim());
                 // then re-instantiate the B+Tree
-                bpt = new BPTree(m);
+                bpt = new BPTree(m - 1);
             }
         }
     }
