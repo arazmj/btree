@@ -41,12 +41,6 @@ public class BPTree {
         // the node in next level
         private Node nextLevel;
 
-        public Key(double key, String val, Node nextLevel) {
-            this.key  = key;
-            this.val  = val;
-            this.nextLevel = nextLevel;
-        }
-
         public Key(double key, Node nextLevel) {
             this.key  = key;
             this.val = null;
@@ -65,8 +59,8 @@ public class BPTree {
         // must be even and greater than 2
         if (m < 4)
             m = 4;
-        if (m % 2 == 1)
-            m++;
+//        if (m % 2 == 1)
+//            m++;
         this.m = m;
         root = new Node(0);
     }
@@ -98,6 +92,13 @@ public class BPTree {
         return null;
     }
 
+
+    /**
+     * Find the first node less than the key
+     * Used to find the lower bound for range search
+     * @param key1
+     * @return The first node that contains
+     */
     private Node getNodeFLT(double key1) {
         return searchNodeFLT(root, key1, height);
     }
@@ -157,6 +158,9 @@ public class BPTree {
                         // the node on the next level didn't need to be split and node has been inserted, just return
                         return null;
                     }
+
+                    // if the node in the next level has been split the current node is internal
+                    // internal key the it points
                     newKey.key = u.children[0].key;
                     newKey.nextLevel = u;
                     t++;
@@ -173,11 +177,12 @@ public class BPTree {
         if (node.k < m)
             return null;
         else {
-            Node n = new Node(m /2);
+            int ceil = (int)Math.ceil(m / 2f);
+            Node n = new Node(ceil);
             node.k = m /2;
             n.next = node.next;
             node.next = n;
-            System.arraycopy(node.children, m / 2, n.children, 0, m / 2);
+            System.arraycopy(node.children, m / 2, n.children, 0, ceil);
             return n;
         }
     }
@@ -263,7 +268,9 @@ public class BPTree {
                 }
             }
             else {
+                // If the line does not start with "Search" or "Insert" then the line must be order number.
                 int m = Integer.parseInt(line.trim());
+                // then re-instantiate the B+Tree
                 bpt = new BPTree(m);
             }
         }
