@@ -179,14 +179,18 @@ public class BPTree {
         else {
             int ceil = (int)Math.ceil(m / 2f);
             // the new node takes the bigger part in case of odd order
-            Node n = new Node(ceil);
+            Node newNode = new Node(ceil);
             node.k = m /2;
-            n.next = node.next;
-            node.next = n;
+
+            // establish a singly linked in the external level
+            // 1. assign the next reference of current node to the new node next
+            // 2. assign the newNode to next of current node
+            newNode.next = node.next;
+            node.next = newNode;
 
             // copy all numbers from m / 2 to ceil( m / 2.0)
-            System.arraycopy(node.children, m / 2, n.children, 0, ceil);
-            return n;
+            System.arraycopy(node.children, m / 2, newNode.children, 0, ceil);
+            return newNode;
         }
     }
 
