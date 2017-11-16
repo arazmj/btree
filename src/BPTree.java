@@ -3,6 +3,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BPTree {
@@ -66,10 +68,30 @@ public class BPTree {
 
     /**
      * @param key
-     * @return the node that contains the exact match for the key
+     * @return tlisy of values for the key
      */
-    public Node getNode(double key) {
-        return searchNode(root, key, height);
+    public List<String> get(double key) {
+        Node node = searchNode(root, key, height);
+        if (node == null)
+            return Arrays.asList("Null");
+
+        List<String> result = new LinkedList<>();
+
+        while(node != null) {
+            for (int i = 0; i < node.k; i++) {
+                if (node.children[i].key == key) {
+                    result.add(node.children[i].val);
+                }
+            }
+
+            // do not look further if the key value is bigger
+            if (node.children[node.k - 1].key > key)
+                break;
+
+            node = node.next;
+        }
+
+        return result;
     }
 
 
@@ -91,14 +113,28 @@ public class BPTree {
     }
 
 
-    /**
-     * Find the first node less than the key
-     * Used to find the lower bound for range search
-     * @param key1
-     * @return The first node that contains
-     */
-    private Node getNodeFLT(double key1) {
-        return searchNodeFLT(root, key1, height);
+    private List<String> get(double key1, double key2) {
+        Node node = searchNodeFLT(root, key1, height);
+
+        if (node == null)
+            return Arrays.asList("Null");
+
+        List<String> result = new LinkedList<>();
+        while(node != null) {
+            for (int i = 0; i < node.k; i++) {
+                double currentKey = node.children[i].key;
+                if (currentKey >= key1 && currentKey <= key2) {
+                    result.add("(" + currentKey + "," + node.children[i].val + ")");
+                }
+            }
+
+            // do not look further if the key value is bigger
+            if (node.children[node.k - 1].key > key2)
+                break;
+
+            node = node.next;
+        }
+        return result;
     }
 
     private Node searchNodeFLT(Node node, double key, int height) {
@@ -214,6 +250,8 @@ public class BPTree {
 
         for (String line : lines) {
             line = line.trim();
+
+            // insert key
             if (line.startsWith("Insert")) {
                 String insert = line.replace("Insert", "").replace("(", "").replace(")", "").trim();
 
@@ -221,65 +259,22 @@ public class BPTree {
                 double key = Double.parseDouble(split[0].trim());
                 String value = split[1].trim();
                 bpt.insert(key, value);
-
             }
+
+            // search key
             else if (line.startsWith("Search")) {
                 String search = line.replace("Search", "").replace("(", "").replace(")", "").trim();
-                if (search.contains(",")) {
+                if (search.contains(",")) { // range search
                     String[] split = search.split(",");
                     double key1 = Double.parseDouble(split[0].trim());
                     double key2 = Double.parseDouble(split[1].trim());
-                    Node r = bpt.getNodeFLT(key1);
-
-                    boolean first = true;
-                    while(r != null) {
-                        for (int i = 0; i < r.k; i++) {
-                            double currentKey = r.children[i].key;
-                            if (currentKey >= key1 && currentKey <= key2) {
-                                if (!first) {
-                                    System.out.print(",");
-                                }
-                                first = false;
-                                System.out.print("(" + currentKey + "," + r.children[i].val + ")");
-                            }
-                        }
-
-                        // do not look further if the key value is bigger
-                        if (r.children[r.k - 1].key > key2)
-                            break;
-
-                        r = r.next;
-                    }
-                    System.out.println();
-                } else {
+                    List<String> r = bpt.get(key1, key2);
+                    System.out.println(String.join(",", r));
+                } else {   // single search
                     double key = Double.parseDouble(search);
                     System.out.println("Search Key1: " + key);
-                    Node r = bpt.getNode(key);
-
-                    if (r == null) {
-                        System.out.println("Null");
-                    }
-
-                    boolean first = true;
-                    while(r != null) {
-                        for (int i = 0; i < r.k; i++) {
-                            if (r.children[i].key == key) {
-                                if (!first) {
-                                    System.out.print(",");
-                                }
-                                first = false;
-                                System.out.print(r.children[i].val);
-                            }
-                        }
-
-                        // do not look further if the key value is bigger
-                        if (r.children[r.k - 1].key > key)
-                            break;
-
-                        r = r.next;
-                    }
-                    System.out.println();
-
+                    List<String> r = bpt.get(key);
+                    System.out.println(String.join(",", r));
                 }
             }
             else {
