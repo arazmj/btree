@@ -272,7 +272,7 @@ public class BPTree {
                     System.out.println(String.join(",", r));
                 } else {   // single search
                     double key = Double.parseDouble(search);
-                    System.out.println("Search Key: " + key);
+                    //System.out.println("Search Key: " + key);
                     List<String> r = bpt.get(key);
                     System.out.println(String.join(",", r));
                 }
