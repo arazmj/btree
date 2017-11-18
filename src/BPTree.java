@@ -91,27 +91,35 @@ public class BPTree {
             node = node.next;
         }
 
+        if (result.isEmpty())
+            return Arrays.asList("Null");
+
         return result;
     }
-
 
     private Node searchNode(Node node, double key, int height) {
         Key[] children = node.children;
 
         if (height > 0) {
             for (int i = 0; i < node.k; i++) {
-                if (i+1 == node.k || (key < children[i+1].key))
+                if (i+1 == node.k || (key <= children[i+1].key))
                     return searchNode(children[i].nextLevel, key, height-1);
             }
         }
         else {
-            for (int j = 0; j < node.k; j++) {
-                if (key == children[j].key) return node;
-            }
+            return node;
         }
         return null;
     }
 
+    // formatter helper, to avoid unnecessary precisions in for doubles
+    public static String fmt(double d)
+    {
+        if(d == (long) d)
+            return String.format("%d",(long)d);
+        else
+            return String.format("%s",d);
+    }
 
     private List<String> get(double key1, double key2) {
         Node node = searchNodeFLT(root, key1, height);
@@ -124,7 +132,7 @@ public class BPTree {
             for (int i = 0; i < node.k; i++) {
                 double currentKey = node.children[i].key;
                 if (currentKey >= key1 && currentKey <= key2) {
-                    result.add("(" + currentKey + "," + node.children[i].val + ")");
+                    result.add("(" + fmt(currentKey) + ", " + node.children[i].val + ")");
                 }
             }
 
@@ -134,13 +142,17 @@ public class BPTree {
 
             node = node.next;
         }
+
+        if (result.isEmpty()) {
+            return Arrays.asList("Null");
+        }
         return result;
     }
 
     private Node searchNodeFLT(Node node, double key, int height) {
         Key[] children = node.children;
             for (int i = 0; i < node.k; i++) {
-                if (i+1 == node.k || (key < children[i+1].key)) {
+                if (i+1 == node.k || (key <= children[i+1].key)) {
                     if (height > 0) {
                         return searchNodeFLT(children[i].nextLevel, key, height - 1);
                     } else {
@@ -150,7 +162,6 @@ public class BPTree {
         }
         return null;
     }
-
 
     public void insert(double key, String val) {
         Node splitLeftover = insertInternal(root, key, val, height);
@@ -254,7 +265,6 @@ public class BPTree {
             // insert key
             if (line.startsWith("Insert")) {
                 String insert = line.replace("Insert", "").replace("(", "").replace(")", "").trim();
-
                 String[] split = insert.split(",");
                 double key = Double.parseDouble(split[0].trim());
                 String value = split[1].trim();
@@ -269,12 +279,11 @@ public class BPTree {
                     double key1 = Double.parseDouble(split[0].trim());
                     double key2 = Double.parseDouble(split[1].trim());
                     List<String> r = bpt.get(key1, key2);
-                    System.out.println(String.join(",", r));
+                    System.out.println(String.join(", ", r));
                 } else {   // single search
                     double key = Double.parseDouble(search);
-                    System.out.println("Search Key1: " + key);
                     List<String> r = bpt.get(key);
-                    System.out.println(String.join(",", r));
+                    System.out.println(String.join(", ", r));
                 }
             }
             else {
