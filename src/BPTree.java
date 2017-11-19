@@ -1,6 +1,7 @@
 
 
-import java.io.IOException;
+//import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -234,6 +235,10 @@ public class BPTree {
     }
 
     public static void main(String[] args) {
+
+        try {
+            PrintStream myout = new PrintStream(new FileOutputStream("output_file.txt"));
+
         List<String> lines = null;
         try {
             lines = Files.readAllLines(Paths.get(args[0]));
@@ -264,11 +269,15 @@ public class BPTree {
                     double key1 = Double.parseDouble(split[0].trim());
                     double key2 = Double.parseDouble(split[1].trim());
                     List<String> r = bpt.get(key1, key2);
-                    System.out.println(String.join(", ", r));
+                    //System.out.println(String.join(", ", r));
+                    myout.println(String.join(", ", r));
                 } else {   // single search
                     double key = Double.parseDouble(search);
                     List<String> r = bpt.get(key);
-                    System.out.println(String.join(", ", r));
+
+                    //System.out.println(String.join(", ", r));
+
+                    myout.println(String.join(", ", r));
                 }
             }
             else {
@@ -277,6 +286,13 @@ public class BPTree {
                 // then re-instantiate the B+Tree
                 bpt = new BPTree(m - 1);
             }
+
+        }
+
+            myout.close();
+        }
+        catch(IOException e1) {
+            System.out.println("Error during reading/writing");
         }
     }
 }
