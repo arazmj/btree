@@ -1,6 +1,7 @@
 
 
 //import java.io.IOException;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,7 +46,7 @@ public class BPTree {
         private Node nextLevel;
 
         public Key(double key, Node nextLevel) {
-            this.key  = key;
+            this.key = key;
             this.val = null;
             this.nextLevel = nextLevel;
         }
@@ -78,7 +79,7 @@ public class BPTree {
 
         List<String> result = new LinkedList<>();
 
-        while(node != null) {
+        while (node != null) {
             for (int i = 0; i < node.k; i++) {
                 if (node.children[i].key == key) {
                     result.add(node.children[i].val);
@@ -99,12 +100,11 @@ public class BPTree {
     }
 
     // formatter helper, to avoid unnecessary precisions in for doubles
-    private static String fmt(double d)
-    {
-        if(d == (long) d)
-            return String.format("%d",(long)d);
+    private static String fmt(double d) {
+        if (d == (long) d)
+            return String.format("%d", (long) d);
         else
-            return String.format("%s",d);
+            return String.format("%s", d);
     }
 
     private List<String> get(double key1, double key2) {
@@ -114,7 +114,7 @@ public class BPTree {
             return Arrays.asList("Null");
 
         List<String> result = new LinkedList<>();
-        while(node != null) {
+        while (node != null) {
             for (int i = 0; i < node.k; i++) {
                 double currentKey = node.children[i].key;
                 if (currentKey >= key1 && currentKey <= key2) {
@@ -138,7 +138,7 @@ public class BPTree {
     private Node searchNode(Node node, double key, int height) {
         Key[] children = node.children;
         for (int i = 0; i < node.k; i++) {
-            if (i+1 == node.k || (key <= children[i+1].key)) {
+            if (i + 1 == node.k || (key <= children[i + 1].key)) {
                 if (height > 0) {
                     return searchNode(children[i].nextLevel, key, height - 1);
                 } else {
@@ -178,16 +178,15 @@ public class BPTree {
                     break;
                 }
             }
-        }
-        else {
+        } else {
             for (t = 0; t < node.k; t++) {
 
                 // condition1: making sure t does not exceed node.children bound (or)
                 // condition2: the key to be inserted is less than the next key
-                if (t+1 == node.k || key < node.children[t+1].key) {
+                if (t + 1 == node.k || key < node.children[t + 1].key) {
 
                     // key needs to be inserted at next level, decrease height by one
-                    Node u = insertInternal(node.children[t].nextLevel, key, val, height-1);
+                    Node u = insertInternal(node.children[t].nextLevel, key, val, height - 1);
                     if (u == null) {
                         // the node on the next level didn't need to be split and node has been inserted, just return
                         return null;
@@ -205,7 +204,7 @@ public class BPTree {
 
         // shift all the children on the right starting from t to right by one
         for (int i = node.k; i > t; i--)
-            node.children[i] = node.children[i-1];
+            node.children[i] = node.children[i - 1];
 
         // insert new key
         node.children[t] = newKey;
@@ -214,13 +213,13 @@ public class BPTree {
         if (node.k < m)
             return null;
         else {
-            int ceil = (int)Math.ceil(m / 2f);
+            int ceil = (int) Math.ceil(m / 2f);
 
             // the new node takes the bigger part in case of odd order
             Node newNode = new Node(ceil);
 
             // the old node (current node) takes the smaller part in case of odd order
-            node.k = m /2;
+            node.k = m / 2;
 
             // establish a singly linked in the external level
             // 1. assign the next reference of current node to the new node next
@@ -236,63 +235,57 @@ public class BPTree {
 
     public static void main(String[] args) {
 
-        try {
-            PrintStream printStream = new PrintStream(new FileOutputStream("output_file.txt"));
+        PrintStream printStream = null;
+        try
+        {
+            printStream = new PrintStream(
+                    new FileOutputStream("output_file.txt"));
+            List<String> lines = Files.readAllLines(Paths.get(args[0]));
 
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(Paths.get(args[0]));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            // default BPTree, just in case that order is not provided from the input
+            BPTree bpt = new BPTree(4);
 
-        // default BPTree, just in case that order is not provided from the input
-        BPTree bpt = new BPTree(4);
+            for (String line : lines) {
+                line = line.trim();
 
-        for (String line : lines) {
-            line = line.trim();
+                // insert key
+                if (line.startsWith("Insert")) {
+                    String insert = line.replace("Insert", "").replace("(", "").replace(")", "").trim();
+                    String[] split = insert.split(",");
+                    double key = Double.parseDouble(split[0].trim());
+                    String value = split[1].trim();
+                    bpt.insert(key, value);
+                }
 
-            // insert key
-            if (line.startsWith("Insert")) {
-                String insert = line.replace("Insert", "").replace("(", "").replace(")", "").trim();
-                String[] split = insert.split(",");
-                double key = Double.parseDouble(split[0].trim());
-                String value = split[1].trim();
-                bpt.insert(key, value);
-            }
+                // search key
+                else if (line.startsWith("Search")) {
+                    String search = line.replace("Search", "").replace("(", "").replace(")", "").trim();
+                    if (search.contains(",")) { // range search
+                        String[] split = search.split(",");
+                        double key1 = Double.parseDouble(split[0].trim());
+                        double key2 = Double.parseDouble(split[1].trim());
+                        List<String> r = bpt.get(key1, key2);
+                        //System.out.println(String.join(", ", r));
+                        printStream.println(String.join(", ", r));
+                    } else {   // single search
+                        double key = Double.parseDouble(search);
+                        List<String> r = bpt.get(key);
 
-            // search key
-            else if (line.startsWith("Search")) {
-                String search = line.replace("Search", "").replace("(", "").replace(")", "").trim();
-                if (search.contains(",")) { // range search
-                    String[] split = search.split(",");
-                    double key1 = Double.parseDouble(split[0].trim());
-                    double key2 = Double.parseDouble(split[1].trim());
-                    List<String> r = bpt.get(key1, key2);
-                    //System.out.println(String.join(", ", r));
-                    printStream.println(String.join(", ", r));
-                } else {   // single search
-                    double key = Double.parseDouble(search);
-                    List<String> r = bpt.get(key);
+                        //System.out.println(String.join(", ", r));
 
-                    //System.out.println(String.join(", ", r));
-
-                    printStream.println(String.join(", ", r));
+                        printStream.println(String.join(", ", r));
+                    }
+                } else {
+                    // If the line does not start with "Search" or "Insert" then the line must be order number.
+                    int m = Integer.parseInt(line.trim());
+                    // then re-instantiate the B+Tree
+                    bpt = new BPTree(m - 1);
                 }
             }
-            else {
-                // If the line does not start with "Search" or "Insert" then the line must be order number.
-                int m = Integer.parseInt(line.trim());
-                // then re-instantiate the B+Tree
-                bpt = new BPTree(m - 1);
-            }
-
-        }
-
-            printStream.close();
-        }
-        catch(IOException e1) {
+        } catch (IOException e1) {
             System.out.println("Error during reading/writing");
+        } finally {
+            printStream.close();
         }
     }
 }
