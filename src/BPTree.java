@@ -237,7 +237,7 @@ public class BPTree {
     public static void main(String[] args) {
 
         try {
-            PrintStream myout = new PrintStream(new FileOutputStream("output_file.txt"));
+            PrintStream printStream = new PrintStream(new FileOutputStream("output_file.txt"));
 
         List<String> lines = null;
         try {
@@ -270,14 +270,14 @@ public class BPTree {
                     double key2 = Double.parseDouble(split[1].trim());
                     List<String> r = bpt.get(key1, key2);
                     //System.out.println(String.join(", ", r));
-                    myout.println(String.join(", ", r));
+                    printStream.println(String.join(", ", r));
                 } else {   // single search
                     double key = Double.parseDouble(search);
                     List<String> r = bpt.get(key);
 
                     //System.out.println(String.join(", ", r));
 
-                    myout.println(String.join(", ", r));
+                    printStream.println(String.join(", ", r));
                 }
             }
             else {
@@ -289,7 +289,7 @@ public class BPTree {
 
         }
 
-            myout.close();
+            printStream.close();
         }
         catch(IOException e1) {
             System.out.println("Error during reading/writing");
