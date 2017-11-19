@@ -231,14 +231,33 @@ public class BPTree {
         }
     }
 
+    public static void test(String[] args) {
+        BPTree bpTree = new BPTree(4);
+        int initialCapacity = 1000;
+        TreeMap<Double, String>  treeMap = new TreeMap<>();
+
+        Random random = new Random();
+        for (int i = 0; i < initialCapacity; i++) {
+            double key = random.nextDouble();
+            String val = "Value : " + key;
+            bpTree.insert(key, val);
+            treeMap.put(key, val);
+        }
+
+     //   Double firstKey = treeMap.firstKey();
+        for (Double key : treeMap.keySet()) {
+            assert treeMap.get(key).equals(bpTree.get(key));
+        }
+    }
+
     public static void main(String[] args) {
 
         PrintStream printStream = null;
         try
         {
-            printStream =  System.out;
-//                    new PrintStream(
-//                    new FileOutputStream("output_file.txt"));
+            printStream =  //System.out;
+                    new PrintStream(
+                    new FileOutputStream("output_file.txt"));
             List<String> lines = Files.readAllLines(Paths.get(args[0]));
 
             // default BPTree, just in case that order is not provided from the input
@@ -269,9 +288,6 @@ public class BPTree {
                     } else {   // single search
                         double key = Double.parseDouble(search);
                         Set<String> r = bpt.get(key);
-
-                        //System.out.println(String.join(", ", r));
-
                         printStream.println(String.join(", ", r));
                     }
                 } else {
