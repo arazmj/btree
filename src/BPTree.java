@@ -5,9 +5,7 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class BPTree {
 
@@ -72,12 +70,12 @@ public class BPTree {
      * @param key
      * @return tlisy of values for the key
      */
-    public List<String> get(double key) {
+    public Set<String> get(double key) {
         Node node = searchNode(root, key, height);
         if (node == null)
-            return Arrays.asList("Null");
+            return new HashSet(Arrays.asList("Null"));
 
-        List<String> result = new LinkedList<>();
+        Set<String> result = new HashSet<>();
 
         while (node != null) {
             for (int i = 0; i < node.k; i++) {
@@ -94,7 +92,7 @@ public class BPTree {
         }
 
         if (result.isEmpty())
-            return Arrays.asList("Null");
+            return new HashSet(Arrays.asList("Null"));
 
         return result;
     }
@@ -107,13 +105,13 @@ public class BPTree {
             return String.format("%s", d);
     }
 
-    private List<String> get(double key1, double key2) {
+    private Set<String> get(double key1, double key2) {
         Node node = searchNode(root, key1, height);
 
         if (node == null)
-            return Arrays.asList("Null");
+            return new HashSet<>(Arrays.asList("Null"));
 
-        List<String> result = new LinkedList<>();
+        Set<String> result = new HashSet<>();
         while (node != null) {
             for (int i = 0; i < node.k; i++) {
                 double currentKey = node.children[i].key;
@@ -130,7 +128,7 @@ public class BPTree {
         }
 
         if (result.isEmpty()) {
-            return Arrays.asList("Null");
+            return new HashSet<>(Arrays.asList("Null"));
         }
         return result;
     }
@@ -238,8 +236,9 @@ public class BPTree {
         PrintStream printStream = null;
         try
         {
-            printStream = new PrintStream(
-                    new FileOutputStream("output_file.txt"));
+            printStream =  System.out;
+//                    new PrintStream(
+//                    new FileOutputStream("output_file.txt"));
             List<String> lines = Files.readAllLines(Paths.get(args[0]));
 
             // default BPTree, just in case that order is not provided from the input
@@ -264,12 +263,12 @@ public class BPTree {
                         String[] split = search.split(",");
                         double key1 = Double.parseDouble(split[0].trim());
                         double key2 = Double.parseDouble(split[1].trim());
-                        List<String> r = bpt.get(key1, key2);
+                        Set<String> r = bpt.get(key1, key2);
                         //System.out.println(String.join(", ", r));
                         printStream.println(String.join(", ", r));
                     } else {   // single search
                         double key = Double.parseDouble(search);
-                        List<String> r = bpt.get(key);
+                        Set<String> r = bpt.get(key);
 
                         //System.out.println(String.join(", ", r));
 
