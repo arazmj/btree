@@ -231,33 +231,64 @@ public class BPTree {
         }
     }
 
-    public static void test(String[] args) {
-        BPTree bpTree = new BPTree(4);
-        int initialCapacity = 1000;
-        TreeMap<Double, String>  treeMap = new TreeMap<>();
+    public static void main(String[] args) {
+        for (int m = 1; m < 20; m++) {
+            System.out.print("\n m:" + m);
+            BPTree bpTree = new BPTree(4);
+            TreeMap<Double, Set<String>> treeMap = new TreeMap<>();
 
-        Random random = new Random();
-        for (int i = 0; i < initialCapacity; i++) {
-            double key = random.nextDouble();
-            String val = "Value : " + key;
-            bpTree.insert(key, val);
-            treeMap.put(key, val);
-        }
+            for (int s = 1; s < 1000; s++) {
+                System.out.print("*");
+                int initialCapacity = m;
+                Random random = new Random();
+                for (int i = 0; i < initialCapacity; i++) {
+                    double key = random.nextDouble();
+                    if (Math.random() > 0.5 && treeMap.size() > 0) {
+                        int nextKeyIndex = random.nextInt(treeMap.keySet().size());
+                        for (Double nextKey : treeMap.keySet()) {
+                            nextKeyIndex--;
+                            if (nextKeyIndex == 0) ;
+                            {
+                                key = nextKey;
+                                break;
+                            }
+                        }
+                    }
+                    String val = "Value : " + key;
+                    bpTree.insert(key, val);
+                    if (i % 10 == 0) {
+                        System.out.print(".");
+                    }
 
-     //   Double firstKey = treeMap.firstKey();
-        for (Double key : treeMap.keySet()) {
-            assert treeMap.get(key).equals(bpTree.get(key));
+                    if (treeMap.containsKey(key)) {
+                        treeMap.get(key).add(val);
+                    } else {
+                        Set<String> stringSet = new HashSet<>();
+                        stringSet.add(val);
+                        treeMap.put(key, stringSet);
+                    }
+
+                }
+
+                for (Double key : treeMap.keySet()) {
+                    Set treeMapVal = treeMap.get(key);
+                    Set<String> bpTreeVal = bpTree.get(key);
+                    if (!treeMapVal.equals(bpTreeVal)) {
+                        System.out.println("Error");
+                    }
+                }
+            }
         }
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 
         PrintStream printStream = null;
         try
         {
-            printStream =  //System.out;
-                    new PrintStream(
-                    new FileOutputStream("output_file.txt"));
+            printStream =  System.out;
+//                    new PrintStream(
+//                    new FileOutputStream("output_file.txt"));
             List<String> lines = Files.readAllLines(Paths.get(args[0]));
 
             // default BPTree, just in case that order is not provided from the input
